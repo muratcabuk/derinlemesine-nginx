@@ -1,18 +1,9 @@
 FROM ubuntu:20.04
 
-LABEL maintainer="armand@f5.com"
-
-# https://docs.nginx.com/nginx/releases/
-ENV NGINX_VERSION 23        
-# https://nginx.org/en/docs/njs/changes.html
-ENV NJS_VERSION   0.5.2     
-# https://plus-pkgs.nginx.com
-
-ENV PKG_RELEASE   1   
-
 RUN mkdir -p /etc/ssl/nginx
-COPY etc/ssl/nginx/nginx-repo.crt /etc/ssl/nginx/nginx-repo.crt
-COPY etc/ssl/nginx/nginx-repo.key /etc/ssl/nginx/nginx-repo.key
+
+COPY nginx-repo.crt /etc/ssl/nginx/nginx-repo.crt
+COPY nginx-repo.key /etc/ssl/nginx/nginx-repo.key
 
 RUN set -x \
     && chmod 644 /etc/ssl/nginx/* \
@@ -24,6 +15,7 @@ RUN set -x \
     && printf "deb https://plus-pkgs.nginx.com/ubuntu focal nginx-plus\n" | tee /etc/apt/sources.list.d/nginx-plus.list \
     && wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90nginx \
     && apt-get update \
+    && apt install vim \
     && apt-cache policy nginx-plus \
     && DEBIAN_FRONTEND=noninteractive apt-get -qq -y install --no-install-recommends nginx-plus=23-1~focal  \
     nginx-plus-module-image-filter=23-1~focal \
@@ -36,6 +28,7 @@ RUN set -x \
     #nginx-plus-module-passenger=23-1~focal \
     #nginx-plus-module-rtmp=23-1~focal \
     #nginx-sync \
+    && mkdir -p /usr/share/nginx/html/images \
     && mkdir -p /var/cache/nginx \
     && chown -R nginx /var/cache/nginx \
     && mkdir -p /var/lib/nginx/state \
@@ -49,6 +42,10 @@ RUN set -x \
     && rm -rf /etc/apt/apt.conf.d/90nginx \
     && rm -rf nginx_signing.key \
     && rm /etc/ssl/nginx/nginx-repo.crt /etc/ssl/nginx/nginx-repo.key
+
+COPY 1.jpg 2.jpg 3.jpg /usr/share/nginx/html/images/
+COPY nginx.conf /etc/nginx/
+COPY default.conf /etc/nginx/conf.d/
 
 EXPOSE 80 443 8080
 STOPSIGNAL SIGTERM
