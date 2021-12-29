@@ -1,1 +1,3 @@
-proje oluşturuldu
+- https://www.nginx.com/category/tech/
+- https://github.com/agile6v/awesome-nginx
+- https://www.nginx.com/resources/wiki/start/topics/tutorials/config_pitfalls/
